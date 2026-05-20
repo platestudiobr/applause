@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applause - Protótipo Interativo (Offline)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            height: 100vh;
+            display: flex;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            gap: 0;
+        }
+
+        /* Animation Canvas */
+        .animation-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            min-width: 0;
+        }
+
+        #animation-container {
+            width: 80%;
+            max-width: 600px;
+            aspect-ratio: 954 / 1080;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Status Bar */
+        .status-bar {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-family: 'Monaco', monospace;
+            max-width: 400px;
+            word-break: break-word;
+            z-index: 100;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+            background: #4ade80;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Chat Section */
+        .chat-section {
+            width: 380px;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid #e0e0e0;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            background: #fafafa;
+        }
+
+        .chat-header h2 {
+            font-size: 18px;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .chat-header p {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.bot {
+            justify-content: flex-start;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-bubble {
+            max-width: 85%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .message.bot .message-bubble {
+            background: #f0f0f0;
+            color: #1a1a1a;
+        }
+
+        .message.user .message-bubble {
+            background: #667eea;
+            color: white;
+        }
+
+        .chat-input-area {
+            padding: 16px 20px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid #d0d0d0;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input:focus {
+            border-color: #667eea;
+        }
+
+        .chat-send-btn {
+            padding: 10px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .chat-send-btn:hover {
+            background: #5568d3;
+        }
+
+        .chat-send-btn:active {
+            background: #4858c0;
+        }
+
+        /* Scrollbar Styling */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f0f0f0;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 3px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #999;
+        }
+
+        @media (max-width: 900px) {
+            .chat-section {
+                width: 300px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .chat-section {
+                width: 100%;
+                height: 40%;
+                border-left: none;
+                border-top: 1px solid #e0e0e0;
+            }
+
+            .animation-section {
+                height: 60%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="animation-section">
+            <div class="status-bar">
+                <span class="status-dot"></span>
+                <span id="status-text">Carregando...</span>
+            </div>
+            <div id="animation-container"></div>
+        </div>
+
+        <div class="chat-section">
+            <div class="chat-header">
+                <h2>Applause</h2>
+                <p>Transforme sua mensagem em movimento</p>
+            </div>
+            <div class="chat-messages" id="chat-messages"></div>
+            <div class="chat-input-area">
+                <input
+                    type="text"
+                    class="chat-input"
+                    id="chat-input"
+                    placeholder="Digite: SIM"
+                    autocomplete="off"
+                />
+                <button class="chat-send-btn" id="chat-send-btn">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
+    <script>
+        // Animation data will be embedded here - insert via console or script tag
+        window.animationData = {
+            idle: null,
+            walk: null
+        };
+
+        class AnimationManager {
+            constructor(containerSelector) {
+                this.container = document.querySelector(containerSelector);
+                this.current = null;
+                this.animations = {};
+            }
+
+            setAnimations(idle, walk) {
+                this.animations = {
+                    idle: idle,
+                    walk: walk
+                };
+                console.log('[AnimationManager] ✓ Animações carregadas');
+                console.log('  - Idle: 44 frames @ 12fps (loop)');
+                console.log('  - Walk: 25 frames @ 12fps (single)');
+                updateStatus('Animações prontas • Aguardando interação');
+            }
+
+            play(name, options = {}) {
+                const { loop = false, autoTransition = null, speed = 1 } = options;
+
+                if (!this.animations[name]) {
+                    console.error(`✗ Animação "${name}" não encontrada`);
+                    return;
+                }
+
+                // Destroy previous animation instance
+                if (this.current) {
+                    this.current.destroy();
+                    this.current = null;
+                }
+
+                const loopText = loop ? '∞ loop' : '1× play';
+                console.log(`[AnimationManager] ▶ ${name} (${loopText})`);
+                updateStatus(`Reproduzindo: ${name} (${loopText})`);
+
+                // Create new animation
+                this.current = lottie.loadAnimation({
+                    container: this.container,
+                    renderer: 'svg',
+                    loop: loop,
+                    autoplay: true,
+                    animationData: this.animations[name],
+                    speed: speed
+                });
+
+                // Listen for completion
+                if (autoTransition) {
+                    this.current.addEventListener('complete', () => {
+                        console.log(`[AnimationManager] ✓ ${name} completado`);
+
+                        const delay = autoTransition.delay || 0;
+                        if (delay > 0) {
+                            setTimeout(() => {
+                                this.play(autoTransition.name, autoTransition.options || {});
+                            }, delay);
+                        } else {
+                            this.play(autoTransition.name, autoTransition.options || {});
+                        }
+                    });
+                }
+
+                return this.current;
+            }
+
+            destroy() {
+                if (this.current) {
+                    this.current.destroy();
+                    this.current = null;
+                }
+            }
+        }
+
+        class ChatManager {
+            constructor(messagesSelector, inputSelector, sendBtnSelector) {
+                this.messagesContainer = document.querySelector(messagesSelector);
+                this.input = document.querySelector(inputSelector);
+                this.sendBtn = document.querySelector(sendBtnSelector);
+
+                this.sendBtn.addEventListener('click', () => this.handleSend());
+                this.input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.handleSend();
+                });
+            }
+
+            handleSend() {
+                const text = this.input.value.trim();
+                if (!text) return;
+
+                this.addMessage(text, 'user');
+                this.input.value = '';
+
+                if (text.toUpperCase() === 'SIM') {
+                    console.log('[ChatManager] ✓ Palavra-chave "SIM" detectada');
+                    if (typeof window.onSimDetected === 'function') {
+                        window.onSimDetected();
+                    }
+                }
+            }
+
+            addMessage(text, sender) {
+                const messageEl = document.createElement('div');
+                messageEl.className = `message ${sender}`;
+                messageEl.innerHTML = `<div class="message-bubble">${escapeHtml(text)}</div>`;
+                this.messagesContainer.appendChild(messageEl);
+                this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function updateStatus(text) {
+            const el = document.getElementById('status-text');
+            el.textContent = text;
+        }
+
+        // Initialize
+        const animationManager = new AnimationManager('#animation-container');
+        const chatManager = new ChatManager('#chat-messages', '#chat-input', '#chat-send-btn');
+
+        let simDetected = false;
+
+        window.onSimDetected = function() {
+            if (simDetected) return;
+            simDetected = true;
+            updateStatus('▶ Aguardando conclusão do loop idle...');
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            chatManager.addMessage('Você completou a missão?', 'bot');
+            updateStatus('Carregue as animações (instruções no console)');
+
+            console.log('%c=== APPLAUSE PROTOTYPE ===', 'color: #667eea; font-weight: bold; font-size: 14px');
+            console.log('Para carregar as animações, abra o console e execute:\n');
+            console.log('window.setAnimations(idleJsonData, walkJsonData)');
+            console.log('\nOu copie os arquivos JSON e execute:');
+            console.log('fetch("caminho/para/0_idle.json").then(r => r.json()).then(idle => fetch("caminho/para/1_action_walk.json").then(r => r.json()).then(walk => window.setAnimations(idle, walk)))');
+        });
+
+        // Manual animation loading via console
+        window.setAnimations = function(idleJson, walkJson) {
+            console.log('[App] Definindo animações...');
+            animationManager.setAnimations(idleJson, walkJson);
+
+            // Start with idle loop + auto transition to walk
+            console.log('[App] Iniciando fluxo de animação:');
+            console.log('  1. Idle (∞ loop)');
+            console.log('  2. Walk detecta "SIM" e dispara após conclusão do idle');
+
+            animationManager.play('idle', {
+                loop: true,
+                autoTransition: {
+                    name: 'walk',
+                    delay: 0,
+                    options: {
+                        loop: false,
+                        autoTransition: {
+                            name: 'idle',
+                            delay: 0,
+                            options: { loop: true }
+                        }
+                    }
+                }
+            });
+
+            updateStatus('Sistema pronto • Digite SIM para teste');
+            console.log('[App] ✓ Sistema pronto para teste');
+        };
+    </script>
+</body>
+</html>

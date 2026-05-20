@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applause - Gamificação Interativa</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #fafbfc;
+            color: #333;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 40px;
+            background: #fff;
+            border-bottom: 1px solid #e8e8e8;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .logo img {
+            height: 32px;
+            width: auto;
+        }
+
+        nav {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #555;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #000;
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .profile-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #e8e8e8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .btn-contact {
+            padding: 8px 20px;
+            border: 2px solid #333;
+            border-radius: 6px;
+            background: transparent;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-contact:hover {
+            background: #333;
+            color: #fff;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 80px);
+            padding: 40px 20px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #d4f1f4;
+            color: #0d7a8a;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            letter-spacing: 0.3px;
+        }
+
+        .title {
+            font-size: 48px;
+            font-weight: 700;
+            color: #1a3a52;
+            text-align: center;
+            margin-bottom: 60px;
+            max-width: 800px;
+            line-height: 1.2;
+        }
+
+        .animation-container {
+            margin-bottom: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+        }
+
+        #lottie-container {
+            width: 200px;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chat-box {
+            width: 100%;
+            max-width: 600px;
+            background: #fff;
+            border: 2px solid #e8e8e8;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 20px;
+            min-height: 240px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .chat-message {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .chat-message.bot {
+            align-items: flex-start;
+        }
+
+        .chat-message.user {
+            align-items: flex-end;
+        }
+
+        .message-bubble {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            max-width: 80%;
+        }
+
+        .message-bubble.bot {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .message-bubble.user {
+            background: #2563eb;
+            color: #fff;
+        }
+
+        .chat-sender {
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 4px;
+        }
+
+        /* ===== INPUT AREA ===== */
+        .input-area {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .input-field {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e8e8e8;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .btn-send {
+            padding: 12px 32px;
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-send:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-send:active {
+            transform: scale(0.98);
+        }
+
+        /* ===== STATUS LOG ===== */
+        .status-log {
+            margin-top: 40px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            max-width: 600px;
+            font-size: 12px;
+            color: #666;
+            font-family: 'Courier New', monospace;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .status-log-item {
+            padding: 4px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .status-log-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-time {
+            color: #999;
+            font-size: 11px;
+        }
+
+        .status-action {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        /* ===== SCROLL ===== */
+        .chat-box::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-box::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-box::-webkit-scrollbar-thumb {
+            background: #ddd;
+            border-radius: 3px;
+        }
+
+        .chat-box::-webkit-scrollbar-thumb:hover {
+            background: #bbb;
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header>
+        <div class="logo">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="16" cy="16" r="14" fill="#FDD835"/>
+                <circle cx="11" cy="14" r="2" fill="#333"/>
+                <circle cx="21" cy="14" r="2" fill="#333"/>
+                <path d="M12 20C14 22 18 22 20 20" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span>applause</span>
+        </div>
+
+        <nav>
+            <a href="#">Início</a>
+            <a href="#">Sobre</a>
+            <a href="#">Segmentos ▼</a>
+            <a href="#">Recursos ▼</a>
+        </nav>
+
+        <div class="nav-right">
+            <div class="profile-icon">👤</div>
+            <button class="btn-contact">Fale Conosco</button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <div class="container">
+        <div class="badge">Incentivo e Reconhecimento para vendas</div>
+
+        <h1 class="title">Complete sua missão:<br>Venda R$ 500,00 em produtos</h1>
+
+        <!-- ANIMATION CONTAINER -->
+        <div class="animation-container">
+            <div id="lottie-container"></div>
+        </div>
+
+        <!-- CHAT BOX -->
+        <div class="chat-box" id="chatBox">
+            <!-- Messages will be added here -->
+        </div>
+
+        <!-- INPUT AREA -->
+        <div class="input-area">
+            <input
+                type="text"
+                class="input-field"
+                id="messageInput"
+                placeholder="Digite sua resposta aqui..."
+                autocomplete="off"
+            >
+            <button class="btn-send" id="sendBtn">ENVIAR</button>
+        </div>
+
+        <!-- STATUS LOG -->
+        <div class="status-log" id="statusLog">
+            <div class="status-log-item"><span class="status-time">[INIT]</span> Sistema iniciado. Carregando animações...</div>
+        </div>
+    </div>
+
+    <script>
+        // ===== ANIMATION MANAGER =====
+        class AnimationManager {
+            constructor(containerId) {
+                this.container = document.getElementById(containerId);
+                this.lottieInstance = null;
+                this.currentAnimation = null;
+                this.isTransitioning = false;
+                this.animationData = {};
+            }
+
+            // Load animation JSON data
+            loadAnimation(name, jsonData) {
+                this.animationData[name] = jsonData;
+                log(`Animation "${name}" loaded`);
+            }
+
+            // Play animation with options
+            async play(name, options = {}) {
+                const {
+                    loop = false,
+                    onComplete = null,
+                    autoTransition = null,
+                } = options;
+
+                if (!this.animationData[name]) {
+                    console.error(`Animation "${name}" not found`);
+                    return;
+                }
+
+                log(`Playing animation: ${name} (loop: ${loop})`);
+
+                // Destroy existing instance
+                if (this.lottieInstance) {
+                    this.lottieInstance.destroy();
+                }
+
+                // Create new instance
+                this.lottieInstance = lottie.loadAnimation({
+                    container: this.container,
+                    renderer: 'svg',
+                    loop: loop,
+                    autoplay: true,
+                    animationData: this.animationData[name],
+                });
+
+                this.currentAnimation = name;
+
+                // Handle completion
+                this.lottieInstance.addEventListener('complete', () => {
+                    log(`Animation complete: ${name}`);
+
+                    if (autoTransition) {
+                        // Smooth transition to next animation
+                        setTimeout(() => {
+                            this.play(autoTransition.name, autoTransition.options);
+                        }, autoTransition.delay || 500);
+                    } else if (onComplete) {
+                        onComplete();
+                    }
+                });
+            }
+
+            // Stop animation
+            stop() {
+                if (this.lottieInstance) {
+                    this.lottieInstance.stop();
+                    log('Animation stopped');
+                }
+            }
+
+            // Pause animation
+            pause() {
+                if (this.lottieInstance) {
+                    this.lottieInstance.pause();
+                    log('Animation paused');
+                }
+            }
+
+            // Resume animation
+            resume() {
+                if (this.lottieInstance) {
+                    this.lottieInstance.play();
+                    log('Animation resumed');
+                }
+            }
+        }
+
+        // ===== CHAT MANAGER =====
+        class ChatManager {
+            constructor(chatBoxId) {
+                this.chatBox = document.getElementById(chatBoxId);
+                this.messages = [];
+            }
+
+            addMessage(text, sender = 'bot') {
+                const message = { text, sender, timestamp: new Date() };
+                this.messages.push(message);
+                this.render();
+                this.scrollToBottom();
+            }
+
+            render() {
+                this.chatBox.innerHTML = '';
+                this.messages.forEach(msg => {
+                    const msgEl = document.createElement('div');
+                    msgEl.className = `chat-message ${msg.sender}`;
+
+                    const senderEl = document.createElement('div');
+                    senderEl.className = 'chat-sender';
+                    senderEl.textContent = msg.sender === 'bot' ? 'Applause Bot' : 'Você';
+
+                    const bubbleEl = document.createElement('div');
+                    bubbleEl.className = `message-bubble ${msg.sender}`;
+                    bubbleEl.textContent = msg.text;
+
+                    msgEl.appendChild(senderEl);
+                    msgEl.appendChild(bubbleEl);
+                    this.chatBox.appendChild(msgEl);
+                });
+            }
+
+            scrollToBottom() {
+                this.chatBox.scrollTop = this.chatBox.scrollHeight;
+            }
+
+            clear() {
+                this.messages = [];
+                this.render();
+            }
+        }
+
+        // ===== STATUS LOGGER =====
+        function log(message) {
+            const statusLog = document.getElementById('statusLog');
+            const item = document.createElement('div');
+            item.className = 'status-log-item';
+
+            const time = new Date().toLocaleTimeString('pt-BR');
+            item.innerHTML = `<span class="status-time">[${time}]</span> <span class="status-action">${message}</span>`;
+
+            statusLog.appendChild(item);
+            statusLog.scrollTop = statusLog.scrollHeight;
+        }
+
+        // ===== INITIALIZE APP =====
+        const animManager = new AnimationManager('lottie-container');
+        const chatManager = new ChatManager('chatBox');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        let conversationStep = 0;
+
+        // Start conversation
+        function startConversation() {
+            conversationStep = 1;
+            chatManager.addMessage('Olá! 👋 Você completou a sua meta de venda de R$ 500,00 em produtos?', 'bot');
+            log('Conversation started. Waiting for user response...');
+        }
+
+        // Handle user message
+        function handleUserMessage() {
+            const text = messageInput.value.trim();
+            if (!text) return;
+
+            chatManager.addMessage(text, 'user');
+            messageInput.value = '';
+            log(`User message: "${text}"`);
+
+            if (conversationStep === 1) {
+                // Check if user said SIM (YES)
+                if (text.toUpperCase().includes('SIM')) {
+                    conversationStep = 2;
+                    log('User confirmed completion. Triggering animation sequence...');
+
+                    // Trigger animation sequence
+                    triggerAnimationSequence();
+                } else {
+                    chatManager.addMessage('Por favor, responda com SIM se completou a missão.', 'bot');
+                    log('Invalid response. Waiting for SIM...');
+                }
+            }
+        }
+
+        // Trigger animation sequence
+        async function triggerAnimationSequence() {
+            log('Animation sequence: Starting IDLE loop...');
+
+            // First: Start IDLE animation in loop
+            animManager.play('idle', {
+                loop: true,
+                // After IDLE completes one cycle, transition to WALK
+                autoTransition: {
+                    name: 'walk',
+                    delay: 0, // No delay between animations
+                    options: {
+                        loop: false, // Walk only plays once
+                        onComplete: () => {
+                            log('Walk animation complete. Returning to IDLE...');
+                            // Return to IDLE after walk
+                            animManager.play('idle', { loop: true });
+                            chatManager.addMessage('🎉 Parabéns! Você subiu de nível! +250 pontos ganhos!', 'bot');
+                        }
+                    }
+                }
+            });
+        }
+
+        // Event listeners
+        sendBtn.addEventListener('click', handleUserMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleUserMessage();
+        });
+
+        // ===== LOAD ANIMATIONS =====
+        // YOU NEED TO PASTE YOUR JSON DATA HERE
+        // OR LOAD FROM FILES
+
+        function initializeAnimations() {
+            // Placeholder for animation data
+            // Replace these with actual JSON from your files
+
+            const idleData = null; // Will be set from file
+            const walkData = null; // Will be set from file
+
+            if (!idleData || !walkData) {
+                log('⚠️ Animation JSON files not loaded. Please paste JSON data below.');
+                showAnimationSetup();
+                return;
+            }
+
+            animManager.loadAnimation('idle', idleData);
+            animManager.loadAnimation('walk', walkData);
+            log('All animations loaded successfully!');
+
+            startConversation();
+        }
+
+        function showAnimationSetup() {
+            log('Waiting for animation data...');
+            const setupDiv = document.createElement('div');
+            setupDiv.style.cssText = `
+                position: fixed;
+                top: 100px;
+                left: 20px;
+                right: 20px;
+                background: #fff3cd;
+                border: 2px solid #ffc107;
+                border-radius: 8px;
+                padding: 20px;
+                z-index: 1000;
+                font-size: 14px;
+                max-height: 300px;
+                overflow-y: auto;
+            `;
+            setupDiv.innerHTML = `
+                <strong>⚠️ Passe os JSONs das animações</strong>
+                <p style="margin-top: 10px; color: #666;">
+                    Abra o console (F12) e execute:
+                </p>
+                <pre style="background: #f5f5f5; padding: 10px; border-radius: 4px; overflow-x: auto; margin-top: 10px;">
+window.setAnimations(idleJson, walkJson);</pre>
+                <p style="margin-top: 10px; color: #666;">
+                    Substitua idleJson e walkJson pelos conteúdos dos arquivos JSON.
+                </p>
+            `;
+            document.body.appendChild(setupDiv);
+        }
+
+        // Global function to set animations from console
+        window.setAnimations = function(idleJson, walkJson) {
+            animManager.loadAnimation('idle', idleJson);
+            animManager.loadAnimation('walk', walkJson);
+            log('✅ Animations loaded successfully!');
+            startConversation();
+            document.querySelector('[style*="position: fixed"]')?.remove();
+        };
+
+        // Initialize
+        log('App initialized. Attempting to load animations...');
+        initializeAnimations();
+    </script>
+</body>
+</html>
